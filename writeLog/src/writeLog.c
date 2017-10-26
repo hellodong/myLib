@@ -37,14 +37,14 @@ int WriteLogFile(const char *pszFileName, const char *pszFunctionName, unsigned 
     fp = fopen(logName, "at+");      				// 打开文件, 每次写入的时候在后面追加
     if (fp == NULL)
     {
-        return;
+        return -1;
     }
 
     // 写入日志时间
     getTime(szTimeStr, sizeof(szTimeStr));
 
     // 写入日志内容
-    length = fprintf(fp, "%-5s [%s][%s] %s() #%d: %s\r\n", g_logLevel[iLogLevel], szTimeStr, pszFileName, pszFunctionName, iCodeLine, pszContent);
+    length = fprintf(fp, "%-5s [%s][%s] %s() #%d: %s", g_logLevel[iLogLevel], szTimeStr, pszFileName, pszFunctionName, iCodeLine, pszContent);
    
     fflush(fp);     // 刷新文件
     fclose(fp);     // 关闭文件

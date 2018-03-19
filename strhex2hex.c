@@ -31,19 +31,41 @@ int strhex2hex_byte(char *str, int size, unsigned char *hex)
 
 }
 
+int strdec2dec_uint32(char *str, int size, unsigned int *value)
+{
+    if (size < 2 || size > 32) {
+        return -1;
+    }
+    
+    int idx;
+    unsigned int dec[32], decValue = 0;
+
+    for (idx = 0; idx < size;idx++)
+    {
+        if ('0' <= str[idx] && str[idx] <= '9')
+        {
+           decValue = decValue * 10;
+           decValue += str[idx] - '0';
+        }else{
+            return -2;
+        }
+    }
+    *value = decValue;
+    
+    return 0;
+}
+
 
 int main (void)
 {
-	char hex[8];
-	unsigned char idx, value;
-	for (idx=0;idx < 0xff;idx++)
-	{
-		sprintf(hex, "%02X",idx);
-		strhex2hex_byte(hex, 2, &value);
-		printf("%s:[%02x]\n", hex, value);
-	}
-		sprintf(hex, "%02X",idx);
-		strhex2hex_byte(hex, 2, &value);
-		printf("%s:[%02x]\n", hex, value);
+    char str[] = "1";
+    char str1[] = "12345679";
+    unsigned int decValue;
+
+    strdec2dec_uint32(str, strlen(str), decValue);
+    printf("%s:%d\n", str, decValue);
+    strdec2dec_uint32(str1, strlen(str1), decValue);
+    printf("%s:%d\n", str1, decValue);
+    
 	return 0;
 }

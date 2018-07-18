@@ -1,0 +1,22 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CC	Makefile	/^CC=gcc $/;"	m
+CFLAGS	Makefile	/^CFLAGS=$/;"	m
+Cond_t	condition.h	/^typedef struct _condition_t Cond_t;$/;"	t	typeref:struct:_condition_t
+LDFLAGS	Makefile	/^LDFLAGS=-lpthread$/;"	m
+LOG	test.c	8;"	d	file:
+_CONDITION_H_	condition.h	2;"	d
+_condition_t	condition.h	/^struct _condition_t$/;"	s
+code	condition.h	/^    int code;$/;"	m	struct:_condition_t
+cond	condition.h	/^    pthread_cond_t  cond;$/;"	m	struct:_condition_t
+condInit	condition.c	/^int condInit(Cond_t *cond)$/;"	f
+condTrigger	condition.c	/^int condTrigger(Cond_t *cond)$/;"	f
+condWait	condition.c	/^int condWait(Cond_t *cond, uint32_t waitSecs)$/;"	f
+gCond	test.c	/^Cond_t gCond;$/;"	v
+main	test.c	/^int main (void)$/;"	f
+mutex	condition.h	/^    pthread_mutex_t mutex;$/;"	m	struct:_condition_t
+test_thread	test.c	/^void *test_thread(void *arg)$/;"	f

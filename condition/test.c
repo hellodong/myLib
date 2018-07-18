@@ -20,11 +20,11 @@ int main (void)
     pthread_t threadId;
 
     condInit(&gCond); 
-    pthread(&threadId, NULL, test_thread, NULL);
+    pthread_create(&threadId, NULL, test_thread, NULL);
     for(;;)
     {
-        ret = condWait(&gCond, 10);
-        LOG("result(%d)", ret);
+        ret = condWait(&gCond, 1);
+        LOG("result(%d) ", ret);
     }
     return 0;
 }
@@ -33,8 +33,8 @@ void *test_thread(void *arg)
 {
     for(;;)
     {
-        condTrigger(&gCond);
         sleep(5);
+        condTrigger(&gCond);
     }
 }
 

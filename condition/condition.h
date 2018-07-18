@@ -5,6 +5,14 @@
 #include <stdint.h>
 
 
+struct _condition_t
+{
+    pthread_cond_t  cond;
+    pthread_mutex_t mutex;
+    int code;
+};
+
+
 typedef struct _condition_t Cond_t;
 
 

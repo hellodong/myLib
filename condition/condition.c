@@ -6,13 +6,8 @@
 
 #include "condition.h"
 
-
-struct _condition_t
-{
-    pthread_cond_t  cond;
-    pthread_mutex_t mutex;
-    int code;
-};
+#define COND_SUCCESS	(0)
+#define COND_TIMEOUT	(110)
 
 
 int condInit(Cond_t *cond)

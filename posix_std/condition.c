@@ -7,14 +7,6 @@
 #include "condition.h"
 
 
-struct _condition_t
-{
-    pthread_cond_t  cond;
-    pthread_mutex_t mutex;
-    int code;
-};
-
-
 int condInit(Cond_t *cond)
 {
     pthread_cond_init(&cond->cond, NULL);

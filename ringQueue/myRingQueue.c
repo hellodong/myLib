@@ -15,16 +15,15 @@ void initQueue(ringQueue_t *thisQueue, uint8_t *buffer, uint32_t bufferSize)
 /*
     push Queue
 */
-int enQueue(ringQueue_t *thisQueue, uint8_t data)
+int enQueue_ctn(ringQueue_t *thisQueue, uint8_t data)
 {
-    uint32_t *rearPtr = 0, front, nextRear;
+    uint32_t *rearPtr = 0, *frontPtr = 0, nextRear;
 
-    front = thisQueue->front;
+    frontPtr = &thisQueue->front;
     rearPtr = &(thisQueue->rear);
     nextRear = (*rearPtr + 1) % (thisQueue->size);
-    if (front == nextRear)
-    {
-        return 0;
+    if (*frontPtr == nextRear) {
+		*frontPtr = (*frontPtr + 1) % (thisQueue->size);
     }
 
     thisQueue->buffer[(*rearPtr)++] = data;
@@ -32,6 +31,25 @@ int enQueue(ringQueue_t *thisQueue, uint8_t data)
 
     return 1;
 }
+
+/* push queue */
+int enQueue_stp(ringQueue_t *thisQueue, uint8_t data)
+{
+    uint32_t *rearPtr = 0, front , nextRear;
+
+    front = thisQueue->front;
+    rearPtr = &(thisQueue->rear);
+    nextRear = (*rearPtr + 1) % (thisQueue->size);
+    if (front == nextRear) {
+		return 0;
+    }
+
+    thisQueue->buffer[(*rearPtr)++] = data;
+    *rearPtr = (*rearPtr) % thisQueue->size;
+
+    return 1;
+}
+
 
 /*
     pop queue

@@ -18,7 +18,9 @@ typedef struct _ringQueue
 
 void initQueue(ringQueue_t *thisQueue, uint8_t *buffer, uint32_t bufferSize);
 
-int enQueue(ringQueue_t *thisQueue, uint8_t data);
+int enQueue_ctn(ringQueue_t *thisQueue, uint8_t data);
+
+int enQueue_stp(ringQueue_t *thisQueue, uint8_t data);
 
 int popQueue(ringQueue_t *thisQueue, uint8_t *data);
 

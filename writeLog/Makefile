@@ -1,9 +1,12 @@
 EXE=logTest
 CC=gcc
+CFLAGS=-g -Wall
+FLAGLD=
 SRCPATH=src/
 BUILD_DIR=build/
 OBJECTS 	=	$(BUILD_DIR)main.o 
-OBJECTS    += 	$(BUILD_DIR)writeLog.o
+OBJECTS    += 	$(BUILD_DIR)logFile.o
+
 
 all:$(BUILD_DIR) ${EXE}
 
@@ -11,13 +14,13 @@ $(BUILD_DIR):
 	mkdir $@
 
 ${EXE}:${OBJECTS}
-	${CC} -o $@ $^
+	${CC} -o $@ $^ ${FLAGLD}
 ${OBJECTS}:${BUILD_DIR}%.o:${SRCPATH}%.c
-	${CC} -c $? -o $@
+	${CC} -c ${CFLAGS} $? -o $@
 
 .PHONY:clean
 
 clean:
-	rm -rf ${EXE} ${OBJECTS}
+	rm -rf ${EXE} ${OBJECTS} test.txt
 	
 

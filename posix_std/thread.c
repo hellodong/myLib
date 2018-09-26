@@ -2,6 +2,8 @@
 
 #include "thread.h"
 
+#include <errno.h>
+
 
 /*
  * retval: 0 -- existed, 1 -- no existed, 
@@ -11,7 +13,6 @@ int thread_check(pthread_t tid)
 {
     int pthread_kill_err = 0;
 	int ret = 0;
-
 
     pthread_kill_err = pthread_kill(tid,0);
     if(pthread_kill_err == ESRCH){

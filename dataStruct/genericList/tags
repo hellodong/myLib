@@ -1,0 +1,74 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+INIT_LIST_HEAD	list.h	/^static inline void INIT_LIST_HEAD(struct list_head *list)$/;"	f
+LIST_HEAD	list.h	39;"	d
+LIST_HEAD_INIT	list.h	37;"	d
+LIST_POISON1	list.h	33;"	d
+LIST_POISON2	list.h	34;"	d
+MAX_STRING_LEN	list_test.c	9;"	d	file:
+Student	list_test.c	/^}Student;$/;"	t	typeref:struct:student	file:
+_LIST_H	list.h	2;"	d
+__list_add	list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
+__list_cut_position	list.h	/^static inline void __list_cut_position(struct list_head *list,$/;"	f
+__list_del	list.h	/^static inline void __list_del(struct list_head * prev, struct list_head * next)$/;"	f
+__list_del_entry	list.h	/^static inline void __list_del_entry(struct list_head *entry)$/;"	f
+__list_for_each	list.h	409;"	d
+__list_splice	list.h	/^static inline void __list_splice(const struct list_head *list,$/;"	f
+add_stu	list_test.c	/^static int add_stu(char* name,char sex,int age)$/;"	f	file:
+clean_up	list_test.c	/^static void clean_up(void)$/;"	f	file:
+container_of	list.h	27;"	d
+dbg_flg	list_test.c	/^static int dbg_flg = 0;$/;"	v	file:
+del_stu	list_test.c	/^static int del_stu(char *name)$/;"	f	file:
+dump_students	list_test.c	/^static void dump_students(void)$/;"	f	file:
+g_student_list	list_test.c	/^LIST_HEAD(g_student_list);$/;"	v
+init_system	list_test.c	/^static void init_system(void)$/;"	f	file:
+list_add	list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
+list_add_tail	list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
+list_cut_position	list.h	/^static inline void list_cut_position(struct list_head *list,$/;"	f
+list_del	list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
+list_del_init	list.h	/^static inline void list_del_init(struct list_head *entry)$/;"	f
+list_empty	list.h	/^static inline int list_empty(const struct list_head *head)$/;"	f
+list_empty_careful	list.h	/^static inline int list_empty_careful(const struct list_head *head)$/;"	f
+list_entry	list.h	368;"	d
+list_first_entry	list.h	379;"	d
+list_first_entry_or_null	list.h	390;"	d
+list_for_each	list.h	398;"	d
+list_for_each_entry	list.h	447;"	d
+list_for_each_entry_continue	list.h	483;"	d
+list_for_each_entry_continue_reverse	list.h	497;"	d
+list_for_each_entry_from	list.h	510;"	d
+list_for_each_entry_reverse	list.h	458;"	d
+list_for_each_entry_safe	list.h	521;"	d
+list_for_each_entry_safe_continue	list.h	537;"	d
+list_for_each_entry_safe_from	list.h	553;"	d
+list_for_each_entry_safe_reverse	list.h	568;"	d
+list_for_each_prev	list.h	417;"	d
+list_for_each_prev_safe	list.h	436;"	d
+list_for_each_safe	list.h	426;"	d
+list_head	list.h	/^ struct list_head {$/;"	s
+list_is_last	list.h	/^static inline int list_is_last(const struct list_head *list,$/;"	f
+list_is_singular	list.h	/^static inline int list_is_singular(const struct list_head *head)$/;"	f
+list_move	list.h	/^static inline void list_move(struct list_head *list, struct list_head *head)$/;"	f
+list_move_tail	list.h	/^static inline void list_move_tail(struct list_head *list,$/;"	f
+list_prepare_entry	list.h	471;"	d
+list_replace	list.h	/^static inline void list_replace(struct list_head *old,$/;"	f
+list_replace_init	list.h	/^static inline void list_replace_init(struct list_head *old,$/;"	f
+list_rotate_left	list.h	/^static inline void list_rotate_left(struct list_head *head)$/;"	f
+list_safe_reset_next	list.h	586;"	d
+list_splice	list.h	/^static inline void list_splice(const struct list_head *list,$/;"	f
+list_splice_init	list.h	/^static inline void list_splice_init(struct list_head *list,$/;"	f
+list_splice_tail	list.h	/^static inline void list_splice_tail(struct list_head *list,$/;"	f
+list_splice_tail_init	list.h	/^static inline void list_splice_tail_init(struct list_head *list,$/;"	f
+m_age	list_test.c	/^		int m_age;$/;"	m	struct:student	file:
+m_list	list_test.c	/^		struct list_head m_list;  \/*把我们的学生对象组织成双向链表，就靠该节点了*\/$/;"	m	struct:student	typeref:struct:student::list_head	file:
+m_name	list_test.c	/^		char m_name[MAX_STRING_LEN];$/;"	m	struct:student	file:
+m_sex	list_test.c	/^		char m_sex;$/;"	m	struct:student	file:
+next	list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
+prev	list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
+student	list_test.c	/^typedef struct student$/;"	s	file:
+student_mgt_exit	list_test.c	/^static void student_mgt_exit(void)$/;"	f	file:
+student_mgt_init	list_test.c	/^static int student_mgt_init(void)$/;"	f	file:

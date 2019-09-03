@@ -16,6 +16,23 @@ typedef struct _dList
 
 static stdList_t gDList;
 
+
+static void addList(int data)
+{
+	/* TODO  */
+}
+
+static stdList* searchList(int data)
+{
+	/* TODO */
+}
+
+static void listDel(stdList *nodePtr)
+{
+	/* TODO */
+}
+
+
 int main(void)
 {
 	stdList_t *nodePtr = NULL;

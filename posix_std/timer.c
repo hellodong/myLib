@@ -10,7 +10,6 @@
 typedef struct
 {
 	unsigned char availid;
-	unsigned char sleepy;
 	unsigned short interval;
 	unsigned int setUpTime_ms;
 	void *arg;
@@ -28,7 +27,7 @@ static unsigned int get_time_ms(void)
 	return tv.tv_sec  * 1000 + tv.tv_usec / 1000;
 }
 
-int timer_add(stCallbackFunc_t func, unsigned short interval_ms, void *arg, unsigned char sleepy)
+int timer_add(stCallbackFunc_t func, unsigned short interval_ms, void *arg)
 {
 	unsigned char idx;
 	for(idx = 0;idx < ARRAY_MAX_NUM;idx++) {
@@ -36,7 +35,6 @@ int timer_add(stCallbackFunc_t func, unsigned short interval_ms, void *arg, unsi
 			timerArray[idx].setUpTime_ms = get_time_ms();
 			timerArray[idx].func = func;
 			timerArray[idx].arg = arg;
-			timerArray[idx].sleepy = sleepy;
 			timerArray[idx].interval = interval_ms;
 			timerArray[idx].availid = 1;
 			return idx;
@@ -51,18 +49,6 @@ void timer_del(int timerId)
 		return;
 	}
 	timerArray[timerId].availid = 0;
-}
-
-int timer_sleepyisDone(void)
-{
-	unsigned char idx;
-	for (idx = 0;idx < ARRAY_MAX_NUM;idx++)
-	{
-		if (timerArray[idx].availid && timerArray[idx].sleepy){
-			return 0;
-		}
-	}
-	return 1;
 }
 
 void timer_run(void)

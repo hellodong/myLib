@@ -7,11 +7,11 @@
 typedef void (*stCallbackFunc_t)(void *arg);
 
 
-int timer_add(stCallbackFunc_t func, unsigned short interval_ms, void *arg, unsigned char sleepy);
+int timer_init(void);
+
+int timer_add(stCallbackFunc_t func, void *arg, unsigned int interval_ms);
 
 void timer_del(int timerId);
-
-int timer_sleepyisDone(void);
 
 void timer_run(void);
 

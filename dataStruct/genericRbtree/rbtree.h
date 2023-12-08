@@ -1,5 +1,5 @@
-#ifndef	_RBTREE_H
-#define	_RBTREE_H
+#ifndef	_RBTREE_H_ 
+#define	_RBTREE_H_
 
 #include <stdlib.h>
 
@@ -93,3 +93,4 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,
 }
 
 #endif	
+

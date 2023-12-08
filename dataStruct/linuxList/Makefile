@@ -5,12 +5,12 @@ SOURCE_DIR=example
 
 BIN=test
 
-all:$(BUILD_DIR) $(BIN)
+all:$(BUILD_DIR) ${BUILD_DIR}/$(BIN)
 
 $(BUILD_DIR):
 	mkdir $@
 
-$(BIN):$(BUILD_DIR)/main.o
+${BUILD_DIR}/$(BIN):$(BUILD_DIR)/main.o
 	$(CC) $^ -o $@ 
 
 $(BUILD_DIR)/main.o:$(SOURCE_DIR)/main.c
@@ -19,4 +19,4 @@ $(BUILD_DIR)/main.o:$(SOURCE_DIR)/main.c
 .PHONY:clean
 
 clean:
-	rm $(BUILD_DIR) $(BIN) -rf
+	rm $(BUILD_DIR)  -rf

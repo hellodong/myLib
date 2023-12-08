@@ -22,12 +22,12 @@ static void addList(int data)
 	/* TODO  */
 }
 
-static stdList* searchList(int data)
+static stdList_t* searchList(int data)
 {
 	/* TODO */
 }
 
-static void listDel(stdList *nodePtr)
+static void listDel(stdList_t *nodePtr)
 {
 	/* TODO */
 }
@@ -40,7 +40,8 @@ int main(void)
 	INIT_LIST_HEAD(&gDList.node);
 
 	int idx;
-	for (idx = 0;idx < 10;idx++){
+	for (idx = 0;idx < 10;idx++)
+    {
 		/* 添加节点 */
 		nodePtr = malloc(sizeof(stdList_t));
 		nodePtr->data = idx;
@@ -50,7 +51,8 @@ int main(void)
 	stdList_t *posPtr = NULL;
 
 	/* 遍历节点  */
-	list_for_each_entry(posPtr, &gDList.node, node){
+	list_for_each_entry(posPtr, &gDList.node, node)
+    {
 		printf("%d \n", posPtr->data);
 	}
 

@@ -85,15 +85,16 @@ void dump(struct rb_root *root)
 int main(int argc, char *argv[])
 {
     int idx = 0;
+    int look4key[2] = {0};
+    struct rb_root root = RB_ROOT;
 
-    srand(0);
+    srand(time(NULL));
     for (idx = 0;idx < NODE_SIZE;idx++)
     {
         nodes[idx].key = rand();
         nodes[idx].val = rand();
     }
 
-    struct rb_root root = RB_ROOT;
 
     for (idx = 0;idx < NODE_SIZE;idx++)
     {
@@ -101,14 +102,49 @@ int main(int argc, char *argv[])
     }
     dump(&root);
 
-    Node_t *searchNode = search(8936987, &root);
+    idx = 0;
+    struct rb_node *rbnode = NULL;
+    Node_t *info = NULL;
+    for (rbnode = rb_first(&root);rbnode;rbnode = rb_next(rbnode))
+    {
+        if (0 == idx)
+        {
+            info = rb_entry(rbnode, Node_t, rb);
+            look4key[0] = info->key;
+        }
+        else if (3 == idx)
+        {
+            info = rb_entry(rbnode, Node_t, rb);
+            look4key[1] = info->key;
+            break;
+        }
+        idx++;
+    }
+
+    Node_t *searchNode = search(look4key[0], &root);
     if (searchNode)
     {
         printf("%d, val:%d\n", searchNode->key, searchNode->val);
     }
     else
     {
-        printf("%d not found\n", 100669);
+        printf("first not found\n");
+    }
+
+    if (searchNode)
+    {
+        printf("erase node %d\n", searchNode->key);
+        erase(searchNode, &root);
+    }
+
+    searchNode = search(look4key[1], &root);
+    if (searchNode)
+    {
+        printf("%d, val:%d\n", searchNode->key, searchNode->val);
+    }
+    else
+    {
+        printf("forth not found\n");
     }
 
     if (searchNode)

@@ -7,6 +7,7 @@
 #include <stddef.h>
 
 #define LOG_BUFF_ITEM_SIZE_MAX  (16384)
+//#define LOG_BUFF_ITEM_SIZE_MAX  (65536)
 #define LOG_BUFF_ITEM_FIX_LEN   (384)
 
 

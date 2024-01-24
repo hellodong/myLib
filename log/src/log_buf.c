@@ -64,15 +64,16 @@ size_t log_buff_copy2cache(stLogBuff_t *log_buff, char **str_cache)
     size_t all_items = 0, idx = 0;
     size_t buff_idx = 0;
     if (NULL == log_buff 
-       || NULL == str_cache 
-       || 0 == log_buff->free_pos)
+     || NULL == str_cache 
+     || 0 == log_buff->free_pos)
     {
         return 0;
     }
     
     all_items = log_buff->free_pos > log_buff->item_size ? log_buff->item_size :log_buff->free_pos;
     *str_cache = (char *) malloc (all_items * log_buff->fix_length);
-    if (NULL == str_cache)
+
+    if (NULL == *str_cache)
     {
         return 0;
     }
@@ -80,7 +81,7 @@ size_t log_buff_copy2cache(stLogBuff_t *log_buff, char **str_cache)
     for(idx = 0;idx < all_items;idx++)
     {
         buff_idx =  (log_buff->cur_head + idx) % log_buff->item_size * log_buff->fix_length;
-        memcpy(str_cache + idx * log_buff->fix_length, log_buff->ringbuf + buff_idx, log_buff->fix_length);
+        memcpy(*str_cache + idx * log_buff->fix_length, log_buff->ringbuf + buff_idx, log_buff->fix_length);
     }
 
     return all_items;

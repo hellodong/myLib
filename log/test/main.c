@@ -17,15 +17,26 @@ int main(int argc, char *argv[])
     }
 
     char valStr[12];
-    for (idx = 0; idx < 0xfff;idx++)
-    {
-        szLen = sprintf(valStr, "%d", idx);
-        
-        snprintf(buff + 254 - szLen , szLen, "%d", idx);
-        loggernofmt(0, LOG_LEVEL_WARN,__FUNCTION__,buff);
-    }
 
-    sleep(4);
+    dftlog_system("=====================================");
+
+    for (jdx = 0;jdx < 16;jdx++)
+    {
+   
+        int tmp =(jdx + 1)  << 12;
+        for (idx = jdx << 12; idx < tmp;idx++)
+        {
+            szLen = sprintf(valStr, "%d", idx);
+
+            snprintf(buff + 254 - szLen , szLen + 1, "%d", idx);
+            loggernofmt(0, LOG_LEVEL_WARN,__FUNCTION__,buff);
+        }
+        usleep(500000);
+    }
+    
+    dftlog_warn("=====================================");
+
+    sleep(1);
 
     return 0;
 }

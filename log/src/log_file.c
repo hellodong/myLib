@@ -12,7 +12,7 @@
 static const int g_maxfile_size = 10 * 1024 * 1024;
 
 
-void _log_iterate(void *origin_file_name)
+void *_log_iterate(void *origin_file_name)
 {
     char file_name[2][128];
     int file_idx = 9;
@@ -34,6 +34,8 @@ void _log_iterate(void *origin_file_name)
     char cmd[256];
     snprintf(cmd, sizeof(cmd), "gzip %s", file_name[0]);
     system(cmd);
+
+    return  NULL;
 }
 
 void _update_log_file(const char *file_name)

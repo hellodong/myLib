@@ -5,6 +5,7 @@
 #include "log_file.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <time.h>
 #include <string.h>
@@ -60,47 +61,96 @@ static int __log_module_init(stLogMod_t *log_mod, int _mod, int log_level)
     return 1; 
 }
 
-int loggernofmt(int _mod, int log_level, const char *_submod, const char *psmsg)
+stLogMod_t *_get_log_inst(int _mod)
 {
-    struct timeval tv; 
-    struct tm tm;
-    char *szMsg = NULL;
-    int szMsgLen = 0;
-
     if (_mod >= LOG_MOD_MAX)
     {
-        return -1;
+        return NULL;
     }
 
     if(0 ==strlen(g_log_mod[_mod].log_file_path)) 
     {
         if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_WARN))
         {
-            return -1;
+            return NULL;
         }
     }
 
-    if (log_level < g_log_mod[_mod].log_level)
+    return g_log_mod + _mod;
+}
+
+int _check_log_level(stLogMod_t *log_inst,int level)
+{
+    if (level < log_inst->log_level)
     {
         return 0;
     }
 
+    return 1;
+}
+
+int _logger_raw_nofmt(stLogMod_t *log_inst, int log_level, const char *_submod, const char *psmsg)
+{
+    struct timeval tv; 
+    struct tm tm;
+    char *szMsg = NULL;
+    int szMsgLen = 0;
+
     gettimeofday(&tv, NULL);
     localtime_r(&tv.tv_sec, &tm);
 
-    pthread_mutex_lock(&g_log_mod[_mod].mutx);
-    szMsg = log_buff_allocate(&g_log_mod[_mod].buff);
-    szMsgLen = snprintf(szMsg, g_log_mod[_mod].buff.fix_length, "%d-%02d-%02d %02d:%02d:%02d.%06ld[%s] %s %s\n", tm.tm_year + 1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, tv.tv_usec, g_level2str[log_level], _submod, psmsg);
-    if (szMsgLen == g_log_mod[_mod].buff.fix_length)
+    pthread_mutex_lock(&log_inst->mutx);
+    szMsg = log_buff_allocate(&log_inst->buff);
+    szMsgLen = snprintf(szMsg, log_inst->buff.fix_length, "%d-%02d-%02d %02d:%02d:%02d.%06ld [%s] %s %s\n", tm.tm_year + 1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, tv.tv_usec, g_level2str[log_level], _submod, psmsg);
+    if (szMsgLen == log_inst->buff.fix_length)
     {
         szMsg[szMsgLen - 1] = '\0';
     }
-    pthread_mutex_unlock(&g_log_mod[_mod].mutx);
+    pthread_mutex_unlock(&log_inst->mutx);
 
     return szMsgLen;
+
 }
 
+int loggernofmt(int _mod, int log_level, const char *_submod, const char *psmsg)
+{
+    stLogMod_t *log_inst = NULL;
 
+    log_inst =_get_log_inst(_mod);
+    if (NULL == log_inst)
+    {
+        return 0;
+    }
+
+    if(!_check_log_level(log_inst, log_level))
+    {
+        return 0;
+    }
+
+    return _logger_raw_nofmt(log_inst,log_level, _submod, psmsg);
+}
+
+int logger(int _mod, int level, const char *_submod,const char *fmt, ...)
+{
+    stLogMod_t *log_mod_inst  = NULL;
+    log_mod_inst = _get_log_inst(_mod);
+    if(NULL == log_mod_inst)
+    {
+        return 0;
+    }
+    if(!_check_log_level(log_mod_inst, level))
+    {
+        return 0;
+    }
+
+    char psMsg[256] = {0};
+    va_list arg_list;
+    va_start(arg_list, fmt);
+    vsnprintf(psMsg, sizeof(psMsg), fmt, arg_list);
+    va_end(arg_list);
+
+    return _logger_raw_nofmt(log_mod_inst, level, _submod, psMsg);
+}
 
 void *_log2file(void *arg)
 {
@@ -110,9 +160,9 @@ void *_log2file(void *arg)
     while(1)
     {
         sleep(1);
-        //for(idx = 0;idx < LOG_MOD_MAX;idx++)
+        for(idx = 0;idx < LOG_MOD_MAX;idx++)
         {
-            //if(strlen(g_log_mod[idx].log_file_path))
+            if(strlen(g_log_mod[idx].log_file_path))
             {
                 pthread_mutex_lock(&g_log_mod[idx].mutx);
                 item = log_buff_copy2cache(&g_log_mod[idx].buff, &str_cache);
@@ -130,9 +180,3 @@ void *_log2file(void *arg)
     }
 }
 
-
-#if 0
-int logger(int _mod, const char *_submod, ...)
-{
-}
-#endif

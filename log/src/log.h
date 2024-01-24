@@ -8,6 +8,11 @@ enum {
     LOG_MOD_MAX
 };
 
+#define LOG_MOD_FILE_PATH {\
+    "log.log",\
+    "1.log"\
+}
+
 enum {
     LOG_LEVEL_DEBUG,
     LOG_LEVEL_INFO,
@@ -25,9 +30,16 @@ enum {
     "system"\
 }
 
-#define LOG_MOD_FILE_PATH {"log.log", "1.log"}
+#define dftlog_debug(fmt,args...)    logger(LOG_MOD_DFT, LOG_LEVEL_DEBUG, __FUNCTION__,fmt, ##args)
+#define dftlog_info(fmt,args...)     logger(LOG_MOD_DFT, LOG_LEVEL_INFO, __FUNCTION__,fmt, ##args)
+#define dftlog_warn(fmt,args...)     logger(LOG_MOD_DFT, LOG_LEVEL_WARN, __FUNCTION__,fmt, ##args)
+#define dftlog_error(fmt,args...)    logger(LOG_MOD_DFT, LOG_LEVEL_ERROR, __FUNCTION__,fmt, ##args)
+#define dftlog_system(fmt,args...)   logger(LOG_MOD_DFT, LOG_LEVEL_SYSTEM, __FUNCTION__,fmt, ##args)
 
 
 int loggernofmt(int _mod, int log_level, const char *_submod, const char *psmsg);
+
+int logger(int _mod, int level, const char *_submod,const char *fmt, ...);
+
 
 #endif

@@ -18,9 +18,9 @@ int main(int argc, char *argv[])
 
     char valStr[12];
 
-    dftlog_system("=====================================");
+    log_system("=====================================");
 
-    for (jdx = 0;jdx < 16;jdx++)
+    for (jdx = 0;jdx < 128;jdx++)
     {
    
         int tmp =(jdx + 1)  << 12;
@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
             snprintf(buff + 254 - szLen , szLen + 1, "%d", idx);
             loggernofmt(0, LOG_LEVEL_WARN,__FUNCTION__,buff);
         }
-        usleep(500000);
+        usleep(100000);
     }
     
-    dftlog_warn("=====================================");
+    log_warn("=====================================");
 
     sleep(1);
 

@@ -13,20 +13,26 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 
 #define LOG_FILE_STR_MAX    (256)
 
+#define LOG_MOD_IS_RUNNING(log,_mod)   (log & (1 << (_mod)))
+#define LOG_MOD_SET_BIT(log,_mod)     (log |= 1 << (_mod))
+
 typedef struct _logMod
 {
-    char log_file_path[LOG_FILE_STR_MAX];
     int log_level;
     pthread_mutex_t mutx;
     stLogBuff_t buff;
+    stLogFile_t log_file;
 }stLogMod_t;
 
-pthread_t log2file_thread;
-stLogMod_t g_log_mod[LOG_MOD_MAX];
+static unsigned int g_start_mod = 0;
+static sem_t sem;
+static pthread_t log2file_thread;
+static stLogMod_t g_log_mod[LOG_MOD_MAX];
 
 const char *g_level2str[LOG_LEVEL_MAX] = __log_level_str;
 
@@ -45,18 +51,22 @@ static int __log_module_init(stLogMod_t *log_mod, int _mod, int log_level)
     {
         return -1;
     }
-    strncpy(log_mod->log_file_path, __file_name[_mod], sizeof(log_mod->log_file_path));
+    log_file_init(&log_mod->log_file, __file_name[_mod], 10 * 1024 * 1024);
+
     pthread_mutex_init(&log_mod->mutx, NULL);
     log_mod->log_level = log_level;
  
-    if (0 == log2file_thread)
+    if (g_start_mod)
     {
         pthread_attr_t attr;
 
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
         pthread_create(&log2file_thread, &attr,_log2file, NULL);
+        sem_init(&sem, 0, 0);
     }
+
+    LOG_MOD_SET_BIT(g_start_mod, _mod);
 
     return 1; 
 }
@@ -68,7 +78,7 @@ stLogMod_t *_get_log_inst(int _mod)
         return NULL;
     }
 
-    if(0 ==strlen(g_log_mod[_mod].log_file_path)) 
+    if(LOG_MOD_IS_RUNNING(g_start_mod, _mod)) 
     {
         if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_WARN))
         {
@@ -95,6 +105,7 @@ int _logger_raw_nofmt(stLogMod_t *log_inst, int log_level, const char *_submod, 
     struct tm tm;
     char *szMsg = NULL;
     int szMsgLen = 0;
+    size_t free_pos = 0;
 
     gettimeofday(&tv, NULL);
     localtime_r(&tv.tv_sec, &tm);
@@ -106,7 +117,13 @@ int _logger_raw_nofmt(stLogMod_t *log_inst, int log_level, const char *_submod, 
     {
         szMsg[szMsgLen - 1] = '\0';
     }
+    free_pos = log_inst->buff.free_pos;
     pthread_mutex_unlock(&log_inst->mutx);
+
+    if(free_pos)
+    {
+        sem_post(&sem);
+    }
 
     return szMsgLen;
 
@@ -133,6 +150,7 @@ int loggernofmt(int _mod, int log_level, const char *_submod, const char *psmsg)
 int logger(int _mod, int level, const char *_submod,const char *fmt, ...)
 {
     stLogMod_t *log_mod_inst  = NULL;
+
     log_mod_inst = _get_log_inst(_mod);
     if(NULL == log_mod_inst)
     {
@@ -155,22 +173,27 @@ int logger(int _mod, int level, const char *_submod,const char *fmt, ...)
 void *_log2file(void *arg)
 {
     int idx = 0;
-    size_t item = 0;
+    size_t item = 0, fix_len = 0;
     char *str_cache = NULL;
     while(1)
     {
-        sleep(1);
+        //sleep(1);
+        sem_wait(&sem);
+        usleep(10000);
         for(idx = 0;idx < LOG_MOD_MAX;idx++)
         {
-            if(strlen(g_log_mod[idx].log_file_path))
+            if (LOG_MOD_IS_RUNNING(g_start_mod, idx))
             {
                 pthread_mutex_lock(&g_log_mod[idx].mutx);
                 item = log_buff_copy2cache(&g_log_mod[idx].buff, &str_cache);
+                fix_len = g_log_mod[idx].buff.fix_length;
                 log_buff_reset(&g_log_mod[idx].buff);
                 pthread_mutex_unlock(&g_log_mod[idx].mutx);
                 if(item)
                 {
-                    log_file_cache2save(str_cache, item, g_log_mod[idx].buff.fix_length, g_log_mod[idx].log_file_path);
+                    log_file_set_cache(&g_log_mod[idx].log_file, str_cache, item, fix_len);
+                    log_file_cache2save(&g_log_mod[idx].log_file);
+                    log_file_set_cache(&g_log_mod[idx].log_file, NULL, 0, fix_len);
                     free(str_cache);
                 }
             }

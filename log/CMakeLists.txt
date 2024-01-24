@@ -24,7 +24,7 @@ endif()
 #add_library(cMini SHARED rbtree.c)
 include_directories("./src")
 
-add_executable(${PROJECT_NAME}  test/main.c src/log.c src/log_buf.c src/log_file.c)
+add_executable(${PROJECT_NAME}  example/main.c src/log.c src/log_buf.c src/log_file.c)
 
 target_link_libraries(${PROJECT_NAME} pthread)
 

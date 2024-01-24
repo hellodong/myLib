@@ -15,7 +15,7 @@ enum {
 };
 
 #define LOG_MOD_FILE_PATH {\
-    "/var/log/log.log",\
+    "log.log",\
     "log_1.log",\
     "log_2.log",\
     "log_3.log",\

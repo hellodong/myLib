@@ -56,7 +56,7 @@ static int __log_module_init(stLogMod_t *log_mod, int _mod, int log_level)
     pthread_mutex_init(&log_mod->mutx, NULL);
     log_mod->log_level = log_level;
  
-    if (g_start_mod)
+    if (!g_start_mod)
     {
         pthread_attr_t attr;
 
@@ -66,7 +66,6 @@ static int __log_module_init(stLogMod_t *log_mod, int _mod, int log_level)
         sem_init(&sem, 0, 0);
     }
 
-    LOG_MOD_SET_BIT(g_start_mod, _mod);
 
     return 1; 
 }
@@ -78,12 +77,13 @@ stLogMod_t *_get_log_inst(int _mod)
         return NULL;
     }
 
-    if(LOG_MOD_IS_RUNNING(g_start_mod, _mod)) 
+    if(!LOG_MOD_IS_RUNNING(g_start_mod, _mod)) 
     {
         if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_WARN))
         {
             return NULL;
         }
+        LOG_MOD_SET_BIT(g_start_mod, _mod);
     }
 
     return g_log_mod + _mod;

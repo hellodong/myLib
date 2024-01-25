@@ -9,9 +9,6 @@
 #include <pthread.h>
 
 
-static const int g_maxfile_size = 10 * 1024 * 1024;
-
-
 void *_log_iterate(void *arg)
 {
     stLogFile_t *log_file = (stLogFile_t *)arg;
@@ -38,7 +35,7 @@ void *_log_iterate(void *arg)
 
     sem_post(&log_file->sem);
 
-    return  NULL;
+    return NULL;
 }
 
 void _update_log_file(stLogFile_t *log_file)
@@ -105,4 +102,5 @@ size_t log_file_cache2save(stLogFile_t *log_file)
 
 	return szMsgLen;
 }
+
 

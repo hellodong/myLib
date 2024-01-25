@@ -6,6 +6,11 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+
 #define LOG_BUFF_ITEM_SIZE_MAX  (16384)
 //#define LOG_BUFF_ITEM_SIZE_MAX  (65536)
 #define LOG_BUFF_ITEM_FIX_LEN   (384)
@@ -25,5 +30,9 @@ size_t log_buff_copy2cache(stLogBuff_t *log_buff, char **str_cache);
 void log_buff_reset(stLogBuff_t *log_buff);
 char* log_buff_allocate(stLogBuff_t *log_buff);
 void log_buff_destruct(stLogBuff_t *log_buff);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

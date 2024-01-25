@@ -1,6 +1,9 @@
 #ifndef  _LOG_H_
 #define  _LOG_H_
 
+#ifdef __cplusplus
+extern "C"{
+#endif
 
 enum {
     LOG_MOD_DFT,
@@ -53,5 +56,8 @@ int loggernofmt(int _mod, int log_level, const char *_submod, const char *psmsg)
 
 int logger(int _mod, int level, const char *_submod,const char *fmt, ...);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

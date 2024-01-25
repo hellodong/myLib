@@ -1,6 +1,13 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8)
 
-project(minilog C)
+project(self_log)
+
+include(FetchContent)
+FetchContent_Declare(
+      googletest
+      URL https://github.com/google/googletest/archive/refs/tags/release-1.12.0.tar.gz
+)
+FetchContent_MakeAvailable(googletest)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -20,8 +27,10 @@ endif()
 
 endif()
 
+enable_testing()
 
-#add_library(cMini SHARED rbtree.c)
+add_library(minilog STATIC src/log.c src/log_buf.c src/log_file.c)
+
 include_directories("./src")
 
 add_executable(${PROJECT_NAME}  example/main.c src/log.c src/log_buf.c src/log_file.c)
@@ -29,3 +38,6 @@ add_executable(${PROJECT_NAME}  example/main.c src/log.c src/log_buf.c src/log_f
 target_link_libraries(${PROJECT_NAME} pthread)
 
 #target_link_libraries(${PROJECT_NAME} PRIVATE cMini)
+
+add_subdirectory(test)
+

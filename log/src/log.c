@@ -203,3 +203,9 @@ void *_log2file(void *arg)
     }
 }
 
+
+stLogFile_t *_log_get_log_file(int _mod)
+{
+    return &g_log_mod[_mod].log_file;
+}
+

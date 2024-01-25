@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include <semaphore.h>
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 typedef struct {
     char *queue_str;
     int item;
@@ -20,5 +24,9 @@ void log_file_init(stLogFile_t *log_file, const char *file_name, size_t max_file
 size_t log_file_set_cache(stLogFile_t *log_file, char *ring_str, size_t item_size, int fix_len);
 
 size_t log_file_cache2save(stLogFile_t *log_file);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif 

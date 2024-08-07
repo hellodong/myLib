@@ -40,4 +40,4 @@ target_link_libraries(${PROJECT_NAME} pthread)
 #target_link_libraries(${PROJECT_NAME} PRIVATE cMini)
 
 add_subdirectory(test)
-
+install(TARGETS minilog ARCHIVE DESTINATION lib/)

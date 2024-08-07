@@ -21,6 +21,8 @@ typedef struct {
 
 void log_file_init(stLogFile_t *log_file, const char *file_name, size_t max_file_size);
 
+size_t log_file_edit_file_size(stLogFile_t *log_file, size_t max_file_size);
+
 size_t log_file_set_cache(stLogFile_t *log_file, char *ring_str, size_t item_size, int fix_len);
 
 size_t log_file_cache2save(stLogFile_t *log_file);

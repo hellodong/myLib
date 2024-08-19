@@ -59,6 +59,21 @@ void log_buff_reset(stLogBuff_t *log_buff)
     log_buff->free_pos = 0;
 }
 
+int log_buff_is_empty(stLogBuff_t* log_buff)
+{
+    if (NULL == log_buff)
+    {
+        return 1;
+    }
+    
+    if (log_buff->free_pos)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
 size_t log_buff_copy2cache(stLogBuff_t *log_buff, char **str_cache)
 {
     size_t all_items = 0, idx = 0;

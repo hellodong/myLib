@@ -21,6 +21,7 @@ typedef struct _log_buf
 }stLogBuff_t;
 
 int log_buf_construct(stLogBuff_t *log_buff, int item_size, int fix_length);
+int log_buff_is_empty(stLogBuff_t* log_buff);
 size_t log_buff_copy2cache(stLogBuff_t *log_buff, char **str_cache);
 void log_buff_reset(stLogBuff_t *log_buff);
 char* log_buff_allocate(stLogBuff_t *log_buff);

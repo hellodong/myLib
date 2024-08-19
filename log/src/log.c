@@ -99,6 +99,27 @@ int _check_log_level(stLogMod_t *log_inst,int level)
     return 1;
 }
 
+int __chk_logs_buff_empty(void)
+{
+    int idx = 0, is_empty = 1;
+    for (idx = 0; idx < LOG_MOD_MAX; idx++)
+    {
+        is_empty = 1;
+        if (LOG_MOD_IS_RUNNING(g_start_mod, idx))
+        {
+            pthread_mutex_lock(&g_log_mod[idx].mutx);
+            is_empty=log_buff_is_empty(&g_log_mod[idx].buff);
+            pthread_mutex_unlock(&g_log_mod[idx].mutx);
+        }
+        if (!is_empty)
+        {
+            return is_empty;
+        }
+
+    }
+    return is_empty;
+}
+
 int _logger_raw_nofmt(stLogMod_t *log_inst, int log_level, const char *_submod, const char *psmsg)
 {
     struct timeval tv; 
@@ -179,6 +200,10 @@ void *_log2file(void *arg)
     {
         //sleep(1);
         sem_wait(&sem);
+        if (__chk_logs_buff_empty())
+        {
+            continue;
+        }
         usleep(10000);
         for(idx = 0;idx < LOG_MOD_MAX;idx++)
         {

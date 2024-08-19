@@ -191,6 +191,40 @@ int logger(int _mod, int level, const char *_submod,const char *fmt, ...)
     return _logger_raw_nofmt(log_mod_inst, level, _submod, psMsg);
 }
 
+int log_edit_level(int _mod, unsigned int level)
+{
+    stLogMod_t *log_mod_inst  = NULL;
+
+    log_mod_inst = _get_log_inst(_mod);
+    if(NULL == log_mod_inst)
+    {
+        return 0;
+    }
+
+    if (level < LOG_LEVEL_MAX)
+    {
+    	log_mod_inst->log_level = level;
+    }
+    else
+    {
+        return 0;
+    }
+    return level;
+}
+
+size_t log_edit_file_size(int _mod, size_t file_size)
+{
+    stLogMod_t *log_mod_inst  = NULL;
+
+    log_mod_inst = _get_log_inst(_mod);
+    if(NULL == log_mod_inst)
+    {
+        return 0;
+    }
+
+    return log_file_edit_file_size(&log_mod_inst->log_file, file_size);
+}
+
 void *_log2file(void *arg)
 {
     int idx = 0;
@@ -198,7 +232,6 @@ void *_log2file(void *arg)
     char *str_cache = NULL;
     while(1)
     {
-        //sleep(1);
         sem_wait(&sem);
         if (__chk_logs_buff_empty())
         {
@@ -226,5 +259,10 @@ void *_log2file(void *arg)
             item = 0;
         }
     }
+}
+
+stLogFile_t *_log_get_log_file(int _mod)
+{
+    return &g_log_mod[_mod].log_file;
 }
 

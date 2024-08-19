@@ -112,3 +112,5 @@ void log_buff_destruct(stLogBuff_t *log_buff)
     memset(log_buff, 0x00, sizeof(stLogBuff_t));
 }
 
+
+

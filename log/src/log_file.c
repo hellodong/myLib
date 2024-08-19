@@ -9,7 +9,7 @@
 #include <pthread.h>
 
 
-static const int g_maxfile_size = 10 * 1024 * 1024;
+#define LOG_FILE_SIZE_MIN	(16 * 1024)
 
 
 void *_log_iterate(void *arg)
@@ -38,7 +38,7 @@ void *_log_iterate(void *arg)
 
     sem_post(&log_file->sem);
 
-    return  NULL;
+    return NULL;
 }
 
 void _update_log_file(stLogFile_t *log_file)
@@ -63,6 +63,16 @@ void log_file_init(stLogFile_t *log_file, const char *file_name, size_t max_file
     sem_init(&log_file->sem, 0, 1);
     strncpy(log_file->file_name, file_name, sizeof(log_file->file_name));
     log_file->max_file_size = max_file_size;
+}
+
+size_t log_file_edit_file_size(stLogFile_t *log_file, size_t max_file_size)
+{
+    if (max_file_size < LOG_FILE_SIZE_MIN)
+    {
+        max_file_size = LOG_FILE_SIZE_MIN;
+    }
+    log_file->max_file_size = max_file_size;
+    return max_file_size;
 }
 
 size_t log_file_set_cache(stLogFile_t *log_file, char *ring_str, size_t item_size, int fix_len)
@@ -105,4 +115,5 @@ size_t log_file_cache2save(stLogFile_t *log_file)
 
 	return szMsgLen;
 }
+
 

@@ -15,6 +15,9 @@
 extern "C" {
 #endif
 
+#define DWAITFOREVER    ((uint32_t)-1)
+#define DNOWAIT         (0)
+
 
 DSem_t d_sem_new(uint32_t init_val);
 

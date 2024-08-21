@@ -10,7 +10,8 @@ DSem_t d_sem_new(uint32_t init_val)
 
 int d_sem_wait(DSem_t hSem, uint32_t time_out)
 {
-	DWORD dwMiliSeconds = time_out ? time_out : INFINITE;
+	DWORD dwMiliSeconds = time_out == DWAITFOREVER? INFINITE : time_out;
+
 	return WaitForSingleObject(hSem, dwMiliSeconds);
 }
 

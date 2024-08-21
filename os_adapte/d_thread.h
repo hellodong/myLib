@@ -15,7 +15,10 @@
 extern "C" {
 #endif
 
-DThread_t d_thread_new(char threadname[], int thread_pri, size_t stack_size, void* threadfunc, DPvoid_t parameter);
+typedef void (*DThreadTask_t)(void *arg);
+
+
+DThread_t d_thread_new(char threadname[], int thread_pri, size_t stack_size, DThreadTask_t threadfunc, DPvoid_t parameter);
 
 int d_thread_cancel(DThread_t hThread);
 

@@ -1,6 +1,5 @@
 
 
-#include <windows.h>
 #include <iostream>
 
 #include "d_time.h"
@@ -16,7 +15,7 @@ void thread1(DPvoid_t data)
 	while (1)
 	{
 		d_thread_sleep(1000);
-		d_sem_wait(hSem, 0);
+		d_sem_wait(hSem, DWAITFOREVER);
 		std::cout << "thread1 sem lock value " << g_sem_lock_value << std::endl;
 		g_sem_lock_value++;
 		d_sem_post(hSem);
@@ -25,14 +24,13 @@ void thread1(DPvoid_t data)
 
 int main(int argc, char *argv[])
 {
-	hSem = d_sem_new(0);
-	DThread_t thread1id = d_thread_new(NULL, D_THREAD_PRI_LOW, 256 * 1024, thread1, NULL);
+	hSem = d_sem_new(1);
+	DThread_t thread1id = d_thread_new(NULL, D_THREAD_PRI_IDLE, 256 * 1024, thread1, NULL);
 
-	d_sem_post(hSem);
 	while (1)
 	{
 		d_thread_sleep(1000);
-		d_sem_wait(hSem, 0);
+		d_sem_wait(hSem, DWAITFOREVER);
 		std::cout << "main sem lock value " << g_sem_lock_value << std::endl;
 		g_sem_lock_value++;
 		d_sem_post(hSem);

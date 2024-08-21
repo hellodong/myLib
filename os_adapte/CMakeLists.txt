@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(os_api CXX)
+project(OSGen CXX)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -24,15 +24,22 @@ if (MSVC)
     message("Compiler msvc")
     include_directories("win/")
     set(PLATFORMS_SRCS win/d_win_time.cpp win/d_win_thread.cpp win/d_win_sem.cpp)
-    set(SRCS example/example.cpp)
 elseif(UNIX) 
     include_directories("posix/")
-    set(PLATFORMS_SRCS posix/d_posix_time.cpp)
-    set(SRCS example/example2.cpp)
-    #target_link_libraries(${PROJECT_NAME} pthread)
+    set(PLATFORMS_SRCS posix/d_posix_time.cpp posix/d_posix_thread.cpp posix/d_posix_sem.cpp)
 endif()
 
+set(EXAMPLE1_SRCS example/example.cpp)
+set(EXAMPLE2_SRCS example/example2.cpp)
 
-add_executable(${PROJECT_NAME} ${SRCS} ${PLATFORMS_SRCS})
+add_library(${PROJECT_NAME} STATIC ${PLATFORMS_SRCS})
+add_library(${PROJECT_NAME} SHARED ${PLATFORMS_SRCS})
+
+if(UNIX)
+    target_link_libraries(${PROJECT_NAME} pthread)
+endif()
+
+add_executable(exampl1 ${EXAMPLE1_SRCS} ${PLATFORMS_SRCS})
+add_executable(exampl2 ${EXAMPLE2_SRCS} ${PLATFORMS_SRCS})
 
 #target_link_libraries(${PROJECT_NAME} PRIVATE cMini)

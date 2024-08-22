@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.5)
 
 project(OSGen CXX)
 
@@ -16,7 +16,9 @@ elseif(UNIX)
     else()
         message("build type: ${CMAKE_BUILD_TYPE}")
     endif()
+    find_package(Threads REQUIRED)
 endif()
+
 
 include_directories("./")
 
@@ -33,13 +35,15 @@ set(EXAMPLE1_SRCS example/example.cpp)
 set(EXAMPLE2_SRCS example/example2.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${PLATFORMS_SRCS})
-add_library(${PROJECT_NAME} SHARED ${PLATFORMS_SRCS})
+#add_library(${PROJECT_NAME} SHARED ${PLATFORMS_SRCS})
+
+add_executable(example1 ${EXAMPLE1_SRCS} ${PLATFORMS_SRCS})
+add_executable(example2 ${EXAMPLE2_SRCS} ${PLATFORMS_SRCS})
 
 if(UNIX)
-    target_link_libraries(${PROJECT_NAME} pthread)
+    target_link_libraries(example1 PRIVATE pthread)
+    target_link_libraries(example2 PRIVATE pthread)
 endif()
 
-add_executable(exampl1 ${EXAMPLE1_SRCS} ${PLATFORMS_SRCS})
-add_executable(exampl2 ${EXAMPLE2_SRCS} ${PLATFORMS_SRCS})
 
-#target_link_libraries(${PROJECT_NAME} PRIVATE cMini)
+

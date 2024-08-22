@@ -14,10 +14,9 @@ void thread1(DPvoid_t data)
 	std::cout << "thread 1 semaphore test start" << std::endl;
 	while (1)
 	{
-        d_sem_wait(hSemMain, 1);
+        d_sem_wait(hSemMain, DWAITFOREVER);
 		std::cout << d_time_stampms() << ": receive main" << std::endl;
         d_sem_post(hSem1);
-		//d_thread_sleep(1);
 	}
 }
 
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
     while(1)
     {
         d_sem_post(hSemMain);
-        d_sem_wait(hSem1, 1);
+        d_sem_wait(hSem1, DWAITFOREVER);
         std::cout << d_time_stampms() << ": receive thread1" << std::endl;
     }
 

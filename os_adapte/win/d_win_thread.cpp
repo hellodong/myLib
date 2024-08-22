@@ -2,7 +2,7 @@
 #include "d_thread.h"
 
 
-DThread_t d_thread_new(char threadname[], int thread_pri, size_t stack_size, void* threadfunc, DPvoid_t parameter)
+DThread_t d_thread_new(char threadname[], int thread_pri, size_t stack_size, DThreadTask_t threadfunc, DPvoid_t parameter)
 {
 	DThread_t threadhandle;
 

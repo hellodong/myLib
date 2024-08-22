@@ -15,6 +15,12 @@
 extern "C" {
 #endif
 
+#define D_THREAD_STACKSIZE_128K		(128 * 1024)
+#define D_THREAD_STACKSIZE_256K		(256 * 1024)
+#define D_THREAD_STACKSIZE_512K		(512 * 1024)
+#define D_THREAD_STACKSIZE_1M		(1024 * 1024)
+#define D_THREAD_STACKSIZE_2M		(2048 * 1024)
+
 typedef void (*DThreadTask_t)(void *arg);
 
 

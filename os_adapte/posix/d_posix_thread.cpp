@@ -63,7 +63,7 @@ DThread_t d_thread_new(char threadname[], int thread_pri, size_t stack_size, DTh
     pthread_attr_setschedpolicy(&attr, schedpolicy);
     pthread_attr_setschedparam(&attr, &schedpara);
 
-    stack_size = stack_size < (size_t)PTHREAD_STACK_MIN?PTHREAD_STACK_MIN:stack_size;
+    stack_size = stack_size < D_THREAD_STACKSIZE_128K ? D_THREAD_STACKSIZE_128K : stack_size;
     pthread_attr_setstacksize(&attr, stack_size);
 
     threadPara_t *ptask_para;

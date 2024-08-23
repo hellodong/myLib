@@ -9,7 +9,7 @@
 #include <pthread.h>
 
 
-#define LOG_FILE_SIZE_MIN	(16 * 1024)
+#define LOG_FILE_SIZE_MIN	(512 * 1024)
 
 
 void *_log_iterate(void *arg)
@@ -33,8 +33,10 @@ void *_log_iterate(void *arg)
     snprintf(file_name[0], sizeof(file_name[0]), "%s.0", log_file->file_name);
 
     char cmd[256];
+    FILE *popen_stream = NULL;
     snprintf(cmd, sizeof(cmd), "gzip %s", file_name[0]);
-    system(cmd);
+    popen_stream = popen(cmd, "r");
+    pclose(popen_stream);
 
     sem_post(&log_file->sem);
 
@@ -86,32 +88,36 @@ size_t log_file_set_cache(stLogFile_t *log_file, char *ring_str, size_t item_siz
 
 size_t log_file_cache2save(stLogFile_t *log_file)
 {
-    size_t file_size = 0, szMsgLen = 0, idx = 0;
+    size_t file_max_size = 0, szMsgLen = 0, idx = 0;
     char *msg_ptr = NULL;
     FILE *fd = NULL;
 
-    fd = fopen(log_file->file_name, "a+");
-	if (NULL == fd) {
-        fprintf(stderr, "can't open %s\n",log_file->file_name);
-		return 0;
-	}
-
-    for (idx = 0;idx < log_file->item;idx++)
+    file_max_size = log_file->max_file_size;
+    do
     {
-        msg_ptr = log_file->queue_str + idx * log_file->fix_length;
-        szMsgLen = strlen(msg_ptr);
-        fwrite(msg_ptr, szMsgLen, 1, fd);
-        log_file->cur_file_size += szMsgLen;
-    }
+        fd = fopen(log_file->file_name, "a+");
+        if (NULL == fd) {
+            fprintf(stderr, "can't open %s\n",log_file->file_name);
+            return 0;
+        }
 
-	fclose(fd);
+        for (;idx < log_file->item && log_file->cur_file_size <=  file_max_size;idx++)
+        {
+            msg_ptr = log_file->queue_str + idx * log_file->fix_length;
+            szMsgLen = strlen(msg_ptr);
+            fwrite(msg_ptr, szMsgLen, 1, fd);
+            log_file->cur_file_size += szMsgLen;
+        }
 
-    szMsgLen = log_file->cur_file_size;
-    if (log_file->cur_file_size >= log_file->max_file_size) 
-    {
-        _update_log_file(log_file);
-        log_file->cur_file_size = 0;
-    }
+        fclose(fd);
+
+        szMsgLen = log_file->cur_file_size;
+        if (log_file->cur_file_size >= log_file->max_file_size) 
+        {
+            _update_log_file(log_file);
+            log_file->cur_file_size = 0;
+        }
+    }while( idx < log_file->item);
 
 	return szMsgLen;
 }

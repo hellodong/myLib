@@ -237,7 +237,7 @@ void *_log2file(void *arg)
         {
             continue;
         }
-        usleep(10000);
+        usleep(1000);
         for(idx = 0;idx < LOG_MOD_MAX;idx++)
         {
             if (LOG_MOD_IS_RUNNING(g_start_mod, idx))

@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.5)
 
-project(self_log)
+project(dlog)
 
-include(FetchContent)
-FetchContent_Declare(
-      googletest
-      URL https://github.com/google/googletest/archive/refs/tags/release-1.12.0.tar.gz
-)
-FetchContent_MakeAvailable(googletest)
+#include(FetchContent)
+#FetchContent_Declare(
+#      googletest
+#      URL https://github.com/google/googletest/archive/refs/tags/release-1.12.0.tar.gz
+#)
+#FetchContent_MakeAvailable(googletest)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -27,17 +27,21 @@ endif()
 
 endif()
 
+find_package(GTest)
+
 enable_testing()
 
-add_library(minilog STATIC src/log.c src/log_buf.c src/log_file.c)
+add_library(${PROJECT_NAME} STATIC src/log.c src/log_buf.c src/log_file.c)
 
 include_directories("./src")
 
-add_executable(${PROJECT_NAME}  example/main.c src/log.c src/log_buf.c src/log_file.c)
+add_executable(example example/main.c src/log.c src/log_buf.c src/log_file.c)
 
-target_link_libraries(${PROJECT_NAME} pthread)
+target_link_libraries(example pthread)
 
 #target_link_libraries(${PROJECT_NAME} PRIVATE cMini)
 
 add_subdirectory(test)
-install(TARGETS minilog ARCHIVE DESTINATION lib/)
+
+install(TARGETS ${POJECTNAME} ARCHIVE DESTINATION lib/)
+

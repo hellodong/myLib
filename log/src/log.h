@@ -18,11 +18,11 @@ enum {
 };
 
 #define LOG_MOD_FILE_PATH {\
-    "log.log",\
-    "log_1.log",\
-    "log_2.log",\
-    "log_3.log",\
-    "log_4.log",\
+    "/tmp/dlog/log.log",\
+    "/tmp/dlog/log_1.log",\
+    "/tmp/dlog/log_2.log",\
+    "/tmp/dlog/log_3.log",\
+    "/tmp/dlog/log_4.log",\
     "log_5.log",\
     "log_6.log",\
     "log_7.log"\

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(OSGen CXX)
+project(DOSGen CXX)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -28,7 +28,7 @@ if (MSVC)
     set(PLATFORMS_SRCS win/d_win_time.cpp win/d_win_thread.cpp win/d_win_sem.cpp)
 elseif(UNIX) 
     include_directories("posix/")
-    set(PLATFORMS_SRCS posix/d_posix_time.cpp posix/d_posix_thread.cpp posix/d_posix_sem.cpp)
+    set(PLATFORMS_SRCS posix/d_posix_time.cpp posix/d_posix_thread.cpp posix/d_posix_sem.cpp posix/d_posix_mutex.cpp)
 endif()
 
 set(EXAMPLE1_SRCS example/example.cpp)

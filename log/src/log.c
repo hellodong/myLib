@@ -79,7 +79,7 @@ stLogMod_t *_get_log_inst(int _mod)
 
     if(!LOG_MOD_IS_RUNNING(g_start_mod, _mod)) 
     {
-        if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_WARN))
+        if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_INFO))
         {
             return NULL;
         }

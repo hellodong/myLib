@@ -10,11 +10,24 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <pthread.h>
 #include <semaphore.h>
 
+
+#define LOG_MOD_FILE_PATH {\
+    "log.log",\
+    "log_1.log",\
+    "log_2.log",\
+    "log_3.log",\
+    "log_4.log",\
+    "log_5.log",\
+    "log_6.log",\
+    "log_7.log"\
+}
 
 #define LOG_FILE_STR_MAX    (256)
 
@@ -39,19 +52,64 @@ const char *g_level2str[LOG_LEVEL_MAX] = __log_level_str;
 
 static void *_log2file(void *arg);
 
-static int __log_module_init(stLogMod_t *log_mod, int _mod, int log_level)
+static int __log_path_build(const char *log_path)
+{
+    char *file_dir_start_ptr = NULL;
+    if (NULL == log_path)
+    {
+        return 0;
+    }
+
+    file_dir_start_ptr = strchr(log_path, '/');
+    if (NULL == file_dir_start_ptr)
+    {
+        //printf("only file name: %s\n", log_path);
+        return strlen(log_path);
+    }
+    do
+    {
+        char file_dir[256] = {0};
+        if (file_dir_start_ptr - log_path)
+        {
+            memcpy(file_dir, log_path, file_dir_start_ptr - log_path);
+            if (access(file_dir, W_OK))
+            {
+                mkdir(file_dir, S_IRWXU | S_IRWXG| S_IROTH);
+                //printf("%s\n", file_dir);
+            }
+        }
+        file_dir_start_ptr = strchr(file_dir_start_ptr + 1, '/');
+    } while(file_dir_start_ptr);
+    
+    return strlen(log_path);
+}
+
+static int __log_module_init(stLogMod_t *log_mod, int _mod, int log_level, const char *log_path)
 {
     const char* __file_name[LOG_MOD_MAX] = LOG_MOD_FILE_PATH;
+    const char *file_name_ptr = NULL;
+    char log_file_dir[128] = {0};
+    char log_file_all[256] = {0};
     if (NULL == log_mod)
     {
         return -1;
+    }
+
+    if (__log_path_build(log_path))
+    {
+        file_name_ptr = log_path;
+    }
+    else 
+    {
+        file_name_ptr = __file_name[_mod];
     }
 
     if (log_buf_construct(&log_mod->buff, LOG_BUFF_ITEM_SIZE_MAX, LOG_BUFF_ITEM_FIX_LEN))
     {
         return -1;
     }
-    log_file_init(&log_mod->log_file, __file_name[_mod], 10 * 1024 * 1024);
+    
+    log_file_init(&log_mod->log_file, file_name_ptr, 10 * 1024 * 1024);
 
     pthread_mutex_init(&log_mod->mutx, NULL);
     log_mod->log_level = log_level;
@@ -66,7 +124,6 @@ static int __log_module_init(stLogMod_t *log_mod, int _mod, int log_level)
         sem_init(&sem, 0, 0);
     }
 
-
     return 1; 
 }
 
@@ -79,7 +136,7 @@ stLogMod_t *_get_log_inst(int _mod)
 
     if(!LOG_MOD_IS_RUNNING(g_start_mod, _mod)) 
     {
-        if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_INFO))
+        if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_INFO, NULL))
         {
             return NULL;
         }
@@ -223,6 +280,25 @@ size_t log_edit_file_size(int _mod, size_t file_size)
     }
 
     return log_file_edit_file_size(&log_mod_inst->log_file, file_size);
+}
+
+int log_set_filename(int _mod, const char *file_path)
+{
+    if (_mod >= LOG_MOD_MAX)
+    {
+        return -1;
+    }
+
+    if(!LOG_MOD_IS_RUNNING(g_start_mod, _mod)) 
+    {
+        if (-1 == __log_module_init(g_log_mod + _mod, _mod, LOG_LEVEL_INFO, file_path))
+        {
+            return 0;
+        }
+        LOG_MOD_SET_BIT(g_start_mod, _mod);
+        return 1;
+    }
+    return 0;
 }
 
 void *_log2file(void *arg)

@@ -17,16 +17,7 @@ enum {
     LOG_MOD_MAX
 };
 
-#define LOG_MOD_FILE_PATH {\
-    "/tmp/dlog/log.log",\
-    "/tmp/dlog/log_1.log",\
-    "/tmp/dlog/log_2.log",\
-    "/tmp/dlog/log_3.log",\
-    "/tmp/dlog/log_4.log",\
-    "log_5.log",\
-    "log_6.log",\
-    "log_7.log"\
-}
+
 
 enum {
     LOG_LEVEL_DEBUG,
@@ -55,6 +46,8 @@ enum {
 int loggernofmt(int _mod, int log_level, const char *_submod, const char *psmsg);
 
 int logger(int _mod, int level, const char *_submod,const char *fmt, ...);
+
+int log_set_filename(int _mod, const char *file_path);
 
 int log_edit_level(int _mod, unsigned int level);
 

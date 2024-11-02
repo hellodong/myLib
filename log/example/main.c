@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
 
     char valStr[12];
 
+    log_set_filename(LOG_MOD_DFT, "/tmp/dlog/log.log");
+
     log_system("start ***********************************");
     loggernofmt(1, LOG_LEVEL_SYSTEM,__FUNCTION__,"start ++++++++++++++++++++++++++++++++++++++");
     loggernofmt(2, LOG_LEVEL_SYSTEM,__FUNCTION__,"start ######################################");
@@ -44,14 +46,14 @@ int main(int argc, char *argv[])
             snprintf(buff3 + 254 - szLen , szLen + 1, "%d", idx);
             snprintf(buff4 + 254 - szLen , szLen + 1, "%d", idx);
             loggernofmt(0, LOG_LEVEL_WARN,__FUNCTION__,buff);
-            loggernofmt(1, LOG_LEVEL_WARN,__FUNCTION__,buff2);
+            //loggernofmt(1, LOG_LEVEL_WARN,__FUNCTION__,buff2);
             loggernofmt(2, LOG_LEVEL_INFO,__FUNCTION__,buff3);
-            loggernofmt(3, LOG_LEVEL_WARN,__FUNCTION__,buff4);
+            //loggernofmt(3, LOG_LEVEL_WARN,__FUNCTION__,buff4);
         }
         usleep(50000);
     }
     
-    log_warn("******************************************* done");
+    log_info("******************************************* done");
     loggernofmt(1, LOG_LEVEL_SYSTEM,__FUNCTION__,"++++++++++++++++++++++++++++++++++++++ done");
     loggernofmt(2, LOG_LEVEL_SYSTEM,__FUNCTION__,"###################################### done");
     loggernofmt(3, LOG_LEVEL_SYSTEM,__FUNCTION__,"====================================== done");

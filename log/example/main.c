@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     char valStr[12];
 
-    log_set_filename(LOG_MOD_DFT, "/tmp/dlog/log.log");
+    log_dftlog_set_filename("/tmp/dlog/log.log");
 
     log_system("start ***********************************");
     loggernofmt(1, LOG_LEVEL_SYSTEM,__FUNCTION__,"start ++++++++++++++++++++++++++++++++++++++");

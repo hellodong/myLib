@@ -49,6 +49,8 @@ int logger(int _mod, int level, const char *_submod,const char *fmt, ...);
 
 int log_set_filename(int _mod, const char *file_path);
 
+int log_dftlog_set_filename(const char *file_path);
+
 int log_edit_level(int _mod, unsigned int level);
 
 unsigned long log_edit_file_size(int _mod, unsigned long file_size);

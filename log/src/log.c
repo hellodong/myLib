@@ -284,7 +284,7 @@ size_t log_edit_file_size(int _mod, size_t file_size)
 
 int log_set_filename(int _mod, const char *file_path)
 {
-    if (_mod >= LOG_MOD_MAX)
+    if (_mod >= LOG_MOD_MAX || _mod == LOG_MOD_DFT)
     {
         return -1;
     }
@@ -299,6 +299,21 @@ int log_set_filename(int _mod, const char *file_path)
         return 1;
     }
     return 0;
+}
+
+int log_dftlog_set_filename(const char *file_path)
+{
+    if(!LOG_MOD_IS_RUNNING(g_start_mod, LOG_MOD_DFT)) 
+    {
+        if (-1 == __log_module_init(g_log_mod + LOG_MOD_DFT, LOG_MOD_DFT, LOG_LEVEL_INFO, file_path))
+        {
+            return 0;
+        }
+        LOG_MOD_SET_BIT(g_start_mod, LOG_MOD_DFT);
+        return 1;
+    }
+    return 0;
+
 }
 
 void *_log2file(void *arg)

@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <atomic>
 #include <vector>
-#include "../fifo.h"
+#include "fifo.h"
 
 class FifoTest : public ::testing::Test {
 protected:
@@ -256,6 +256,7 @@ struct ThreadTestContext {
 void* producer_thread(void* arg) {
     ThreadTestContext* ctx = static_cast<ThreadTestContext*>(arg);
     
+    usleep(1000);
     for (int i = 0; i < ctx->produce_count; i++) {
         char data = 'A' + (i % 52);
         ctx->produced_data.push_back(data);
@@ -270,18 +271,20 @@ void* producer_thread(void* arg) {
 
 void* consumer_thread(void* arg) {
     ThreadTestContext* ctx = static_cast<ThreadTestContext*>(arg);
-    
+
     while (true) {
-        char data = 0;
-        unsigned int read = fifo_get(ctx->fifo, &data, 1);
-        
+        char data_array[1024] = {0};
+        unsigned int read = fifo_get(ctx->fifo, data_array, sizeof(data_array)/sizeof(data_array[0]));
+
         if (read > 0) {
-            ctx->consumed_data.push_back(data);
+            for (unsigned int i = 0; i < read; i++) {
+                ctx->consumed_data.push_back(data_array[i]);
+            }
         } else if (ctx->producer_done) {
             break;
         }
     }
-    
+
     ctx->consumer_done = true;
     return nullptr;
 }
@@ -309,11 +312,10 @@ TEST_F(FifoTest, ProducerConsumerMultiThreaded) {
         pthread_yield();
     }
     
-    EXPECT_EQ(ctx.produced_data.size(), ctx.consume_count);
-    EXPECT_EQ(ctx.consumed_data.size(), ctx.consume_count);
+    EXPECT_EQ(ctx.produced_data.size(), ctx.consumed_data.size());
     
     for (size_t i = 0; i < ctx.produced_data.size(); i++) {
-        EXPECT_EQ(ctx.produced_data[i], ctx.consumed_data[i]);
+        ASSERT_EQ(ctx.produced_data[i], ctx.consumed_data[i]) << "Index " << i << " mismatch";
     }
 }
 

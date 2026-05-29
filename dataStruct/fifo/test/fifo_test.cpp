@@ -5,10 +5,11 @@
 #include <vector>
 #include "fifo.h"
 
-class FifoTest : public ::testing::Test {
+class FifoTest : public ::testing::Test 
+{
 protected:
     struct _fifo_t fifo;
-    unsigned char buffer[4096];
+    unsigned char buffer[0x1000000];
     
     void SetUp() override {
         memset(&fifo, 0, sizeof(fifo));
@@ -255,13 +256,27 @@ struct ThreadTestContext {
 
 void* producer_thread(void* arg) {
     ThreadTestContext* ctx = static_cast<ThreadTestContext*>(arg);
-    
-    usleep(1000);
-    for (int i = 0; i < ctx->produce_count; i++) {
+    char data_array[2];
+    int i = 0;
+
+    for (i = 0; i < ctx->produce_count; i++) 
+    {
         char data = 'A' + (i % 52);
         ctx->produced_data.push_back(data);
-        
-        fifo_put(ctx->fifo, &data, 1);
+        if (i & 0x01)
+        {
+            data_array[1] = data;
+            fifo_put(ctx->fifo, data_array, 2);
+        }
+        else 
+        {
+            data_array[0] = data;
+        }
+    }
+
+    if (i & 0x01) 
+    {
+        fifo_put(ctx->fifo, data_array, 1);
     }
     
     ctx->producer_done = true;
@@ -292,10 +307,10 @@ void* consumer_thread(void* arg) {
 TEST_F(FifoTest, ProducerConsumerMultiThreaded) {
     ThreadTestContext ctx;
     ctx.fifo = &fifo;
-    ctx.produce_count = 65535;
-    ctx.consume_count = 65535;
+    ctx.produce_count = 0x1111111;
+    ctx.consume_count = 0x1111111;
     
-    fifo_init(&fifo, buffer, 4096);
+    fifo_init(&fifo, buffer, 0x800000);
     
     pthread_t producer, consumer;
     pthread_attr_t attr;
@@ -309,7 +324,7 @@ TEST_F(FifoTest, ProducerConsumerMultiThreaded) {
     pthread_attr_destroy(&attr);
     
     while (!ctx.producer_done || !ctx.consumer_done) {
-        pthread_yield();
+        sched_yield();
     }
     
     EXPECT_EQ(ctx.produced_data.size(), ctx.consumed_data.size());

@@ -32,7 +32,6 @@ unsigned int fifo_put(struct _fifo_t *fifo, char data_buffer[], unsigned int len
 
     memcpy(fifo->buffer, data_buffer + l, len - l);
 
-    atomic_thread_fence(memory_order_release);
     fifo->in += len;
 
     return len;
@@ -45,14 +44,12 @@ unsigned int fifo_get(struct _fifo_t *fifo, char data_buffer[], unsigned int siz
     unsigned int offset = 0;
 
     offset = fifo->out & (fifo->size - 1);
-    atomic_thread_fence(memory_order_acquire);
     len = min(size, fifo->in - fifo->out);
   
     l = min(len, fifo->size - offset);
     memcpy(data_buffer, fifo->buffer + offset,  l);
     memcpy(data_buffer + l, fifo->buffer, len -l);
 
-    atomic_thread_fence(memory_order_release);
     fifo->out +=len;
     return len;
 }

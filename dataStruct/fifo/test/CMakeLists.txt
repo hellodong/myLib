@@ -1,8 +1,10 @@
-# Specify GoogleTest installation directory
-set(GTEST_ROOT "/home/zhedongxu/local" CACHE PATH "GoogleTest installation directory")
+set(USER_HOME $ENV{HOME})
+set(GTEST_ROOT "${USER_HOME}/local" CACHE PATH "GoogleTest installation directory")
 list(APPEND CMAKE_PREFIX_PATH "${GTEST_ROOT}")
 
-# Try to find GTest, if not found, use FetchContent to download and build it
+message(STATUS "GTEST_ROOT: ${GTEST_ROOT}")
+
+# Try to find GTest, if not found, quit the build
 find_package(GTest REQUIRED)
 
 # Check if modern CMake targets are available, otherwise use legacy targets

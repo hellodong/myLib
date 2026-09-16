@@ -13,25 +13,7 @@ typedef struct _dList
 	struct list_head node;
 }stdList_t;
 
-
 static stdList_t gDList;
-
-
-static void addList(int data)
-{
-	/* TODO  */
-}
-
-static stdList_t* searchList(int data)
-{
-	/* TODO */
-}
-
-static void listDel(stdList_t *nodePtr)
-{
-	/* TODO */
-}
-
 
 int main(void)
 {

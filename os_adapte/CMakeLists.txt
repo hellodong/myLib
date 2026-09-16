@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(DOSGen CXX)
+project(OS_adapte CXX C)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -28,21 +28,25 @@ if (MSVC)
     set(PLATFORMS_SRCS win/d_win_time.cpp win/d_win_thread.cpp win/d_win_sem.cpp)
 elseif(UNIX) 
     include_directories("posix/")
+    include_directories("basic/")
     set(PLATFORMS_SRCS posix/d_posix_time.cpp posix/d_posix_thread.cpp posix/d_posix_sem.cpp posix/d_posix_mutex.cpp)
 endif()
 
 set(EXAMPLE1_SRCS example/example.cpp)
 set(EXAMPLE2_SRCS example/example2.cpp)
+set(SCHEDULE_SRCS example/schedule_main.c basic/rbtree.c middleware/f_posix_schedule.c)
 
 add_library(${PROJECT_NAME} STATIC ${PLATFORMS_SRCS})
 #add_library(${PROJECT_NAME} SHARED ${PLATFORMS_SRCS})
 
 add_executable(example1 ${EXAMPLE1_SRCS} ${PLATFORMS_SRCS})
 add_executable(example2 ${EXAMPLE2_SRCS} ${PLATFORMS_SRCS})
+add_executable(schedule_main ${SCHEDULE_SRCS} ${PLATFORMS_SRCS})
 
 if(UNIX)
     target_link_libraries(example1 PRIVATE pthread)
     target_link_libraries(example2 PRIVATE pthread)
+    target_link_libraries(schedule_main PRIVATE pthread)
 endif()
 
 

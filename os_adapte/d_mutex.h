@@ -14,14 +14,20 @@ extern "C"
 {
 #endif
 
+#ifndef DWAITFOREVER
+#define DWAITFOREVER    ((unsigned int)-1)
+#endif
+
+#ifndef DNOWAIT
+#define DNOWAIT         (0)
+#endif  
+
 typedef D_IMPL_Mutex_t DMutex_t;
 
 
 DMutex_t d_mutex_new(void);
 
-int d_mutex_lock(DMutex_t mtx, int timeout);
-
-int d_mutex_trylock(DMutex_t mtx);
+int d_mutex_lock(DMutex_t mtx, unsigned int timeout);
 
 int d_mutex_unlock(DMutex_t mtx);
 

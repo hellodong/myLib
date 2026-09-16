@@ -80,7 +80,7 @@ DThread_t d_thread_new(char threadname[], int thread_pri, size_t stack_size, DTh
     }
     else
     {
-        memcpy(ptask_para->taskname, "null", 5);
+        strncpy(ptask_para->taskname, "null", 5);
     }
 
     pthread_create(&thread_id, &attr, __task, (void *)ptask_para);

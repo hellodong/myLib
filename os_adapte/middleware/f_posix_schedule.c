@@ -1,14 +1,20 @@
 
 
+#include <string.h>
+
+#include "list.h"
+#include "rbtree.h"
+
 #include "d_schedule.h"
 #include "d_mutex.h"
 #include "d_thread.h"
 #include "d_semaphore.h"
+#include "d_time.h"
 
 
 typedef struct 
 {
-    const char name[64];
+    char name[64];
     TIMER_PROC_FUNC_t proc_func;
     uint32_t nInterval;
     void *para;
@@ -104,12 +110,67 @@ d_sched_rb_node_t * _rb_first_entry(struct rb_root *task_root)
     return NULL;
 }
 
-int _insert_task()
+int _insert_task(struct rb_root *task_rb_root, uint32_t expire_time, d_sched_list_node_t *list_entry_ptr)
+{
+    d_sched_rb_node_t *next_rb_node = NULL;
+    next_rb_node =_rb_find(task_rb_root, expire_time);
+    if (NULL == next_rb_node)
+    {
+        next_rb_node = (d_sched_rb_node_t *)malloc(sizeof(d_sched_rb_node_t));
+        next_rb_node->expire_time = expire_time;
+        INIT_LIST_HEAD(&next_rb_node->head.node);   
+        list_add_tail(&list_entry_ptr->node, &next_rb_node->head.node);
 
+        rb_init_node(&next_rb_node->rb);
+        _rb_insert(task_rb_root, next_rb_node);
+    }
+    else 
+    {
+        list_add_tail(&list_entry_ptr->node, &next_rb_node->head.node);
+    }
+    return 0;
+}
+
+int _find_task(struct rb_root *task_rb_root, const char *name, d_sched_rb_node_t **rb_entry, d_sched_list_node_t **list_entry)
+{
+    int is_found = 0;
+    struct rb_root *rbnode = NULL;
+    d_sched_rb_node_t *rb_entry_ptr = NULL;
+    d_sched_list_node_t *list_entry_ptr = NULL;
+    for (rbnode = rb_first(&timer_ctx.task_root);rbnode;rbnode = rb_next(rbnode))
+    {
+        list_entry_ptr = NULL;
+        rb_entry_ptr = rb_entry(rbnode, d_sched_rb_node_t, rb);
+        list_for_each_entry(list_entry_ptr, &rb_entry_ptr->head.node, node)
+        {
+            if (!strcmp(name, list_entry_ptr->inst_info.name) 
+                && strlen(name) == strlen(list_entry_ptr->inst_info.name))
+            {
+                is_found = 1;
+                break;
+            }
+        }
+
+        if (is_found)
+        {
+            if (rb_entry)
+            {
+                *rb_entry = rb_entry_ptr;
+            }
+            if(list_entry)
+            {
+                *list_entry = list_entry_ptr;
+            }
+            return 1;
+        }
+    }
+
+    return 0;
+}
 
 int _timer_get_coming_task_recfg(struct rb_root *task_root, uint32_t cur_time, f_timer_inst_info_t *comming_task)
 {
-    int next_delay = 0;
+    int next_delay = -1;
     struct rb_node *rb_node = NULL;
     d_sched_rb_node_t *rb_first_entry_ptr = NULL;
     d_sched_list_node_t *list_entry_ptr = NULL;
@@ -121,32 +182,19 @@ int _timer_get_coming_task_recfg(struct rb_root *task_root, uint32_t cur_time, f
     rb_first_entry_ptr = _rb_first_entry(task_root);
     if (rb_first_entry_ptr)
     {
+        next_delay = (rb_first_entry_ptr->expire_time > cur_time) ? (rb_first_entry_ptr->expire_time - cur_time) : 0;
         if (cur_time >=rb_first_entry_ptr->expire_time)
         {
             if (!list_empty(&rb_first_entry_ptr->head.node))
             {
                 d_sched_rb_node_t *next_rb_node = NULL;
+
                 list_entry_ptr = list_first_entry(&rb_first_entry_ptr->head.node, d_sched_list_node_t, node);
                 *comming_task = list_entry_ptr->inst_info;
-                list_entry_ptr->inst_info.expire_time = cur_time + list_entry_ptr->inst_info.nInterval;
+
                 list_del(&list_entry_ptr->node);
-
-                next_rb_node =_rb_find(task_root, list_entry_ptr->inst_info.expire_time);
-                if (NULL == next_rb_node)
-                {
-                    next_rb_node = (d_sched_rb_node_t *)malloc(sizeof(d_sched_rb_node_t));
-                    next_rb_node->expire_time = list_entry_ptr->inst_info.expire_time;
-
-                    INIT_LIST_HEAD(&next_rb_node->head.node);   
-                    list_add_tail(&list_entry_ptr->node, &next_rb_node->head.node);
-
-                    rb_init_node(&next_rb_node->rb);
-                    _rb_insert(task_root, next_rb_node);
-                }
-                else 
-                {
-                    list_add_tail(&list_entry_ptr->node, &next_rb_node->head.node);
-                }
+                list_entry_ptr->inst_info.expire_time = cur_time + list_entry_ptr->inst_info.nInterval;
+                _insert_task(task_root, list_entry_ptr->inst_info.expire_time, list_entry_ptr);
             }
 
             if (list_empty(&rb_first_entry_ptr->head.node))
@@ -163,23 +211,10 @@ int _timer_get_coming_task_recfg(struct rb_root *task_root, uint32_t cur_time, f
                 {
                     next_delay = -1;
                 }
-
-            }
-            else 
-            {
-                next_delay = 0;
             }
         }
-        else 
-        {
-            next_delay = rb_first_entry_ptr->expire_time - cur_time;
-        }
-       
     }
-    else 
-    {
-        next_delay = -1;
-    }
+    
     return next_delay;
 }
 
@@ -190,7 +225,7 @@ void __timer_thread_proc(void *arg)
     int time2wait;
     uint32_t cur_time = 0;
 
-    d_mutex_lock(timer_ctx.mtx, -1);
+    d_mutex_lock(timer_ctx.mtx, DWAITFOREVER);
     time2wait = timer_ctx.time2wait;
     d_mutex_unlock(timer_ctx.mtx);
 
@@ -214,13 +249,14 @@ void __timer_thread_proc(void *arg)
 
 int timer_init(void)
 {
-    timer_ctx.sem = d_sem_create(0);
+    timer_ctx.sem = d_sem_new(0);
     timer_ctx.mtx = d_mutex_new();
-    timer_ctx.root.rb_node = NULL;
+    timer_ctx.task_root.rb_node = NULL;
     timer_ctx.time2wait = -1;
     
-    timer_ctrl.thread_id = d_thread_new("Schedule_thread", D_THREAD_PRI_HIGH, D_THREAD_STACKSIZE_256K, __timer_thread_proc, NULL);
+    timer_ctx.thread_id = d_thread_new("Schedule_thread", D_THREAD_PRI_IDLE, D_THREAD_STACKSIZE_256K, __timer_thread_proc, NULL);
 
+    return 0;
 }
 
 int timer_api_create(const char *name, TIMER_PROC_FUNC_t proc_func,uint32_t ninterval, void *para)
@@ -231,21 +267,14 @@ int timer_api_create(const char *name, TIMER_PROC_FUNC_t proc_func,uint32_t nint
     d_sched_list_node_t *list_entry_ptr = NULL;
     int need_sem_post = 0;
 
-    d_mutex_lock(timer_ctx.mtx, -1);
-    for (rbnode = rb_first(&&timer_ctx.task_root);rbnode;rbnode = rb_next(rbnode))
+    d_mutex_lock(timer_ctx.mtx, DWAITFOREVER);
+    
+    if (_find_task(&timer_ctx.task_root, name, NULL, NULL))
     {
-        list_entry_ptr = NULL;
-        rb_entry_ptr = rb_entry(rbnode, d_sched_rb_node_t, rb);
-        list_for_each_entry(list_entry_ptr, &rb_entry_ptr->head.node, node)
-        {
-            if (!strcmp(name, list_entry_ptr->inst_info.name) 
-                && strlen(name) == strlen(list_entry_ptr->inst_info.name))
-            {
-                d_mutex_unlock(timer_ctx.mtx);
-                return 0;
-            }
-        }
+        d_mutex_unlock(timer_ctx.mtx);
+        return 0;
     }
+
     cur_time = d_time_stampms();
     ninterval = ninterval > 0 ? ninterval : 1;
 
@@ -290,44 +319,68 @@ int timer_api_update_interval(const char *name, uint32_t interval)
     struct rb_node *rbnode = NULL;
     d_sched_rb_node_t *rb_entry_ptr = NULL;
     d_sched_list_node_t *list_entry_ptr = NULL;
+    int is_found = 0, need_sem_post = 0;
+    uint32_t cur_time = 0;
 
     cur_time = d_time_stampms();
     interval = interval > 0 ? interval : 1;
 
     d_mutex_lock(timer_ctx.mtx, -1);
-    for (rbnode = rb_first(&&timer_ctx.task_root);rbnode;rbnode = rb_next(rbnode))
-    {
-        list_entry_ptr = NULL;
-        rb_entry_ptr = rb_entry(rbnode, d_sched_rb_node_t, rb);
-        list_for_each_entry(list_entry_ptr, &rb_entry_ptr->head.node, node)
-        {
-            if (!strcmp(name, list_entry_ptr->inst_info.name) 
-                && strlen(name) == strlen(list_entry_ptr->inst_info.name))
-            {
-                break;
-            }
-        }
-        if (is_found)
-        {
-            if (list_entry_ptr->inst_info.nInterval != interval)
-            {    
-                list_entry_ptr->inst_info.nInterval = interval
-                break;
-            }
-            else 
-            {
-                d_mutex_unlock(timer_ctx.mtx);
-                return 0;
-            }
-        }
-    }
+    is_found = _find_task(&timer_ctx.task_root, name, NULL, &list_entry_ptr);
     if (is_found)
     {
-        list_del(&list_entry_ptr->node);
+        if (list_entry_ptr->inst_info.nInterval != interval)
+        {    
+            list_entry_ptr->inst_info.nInterval = interval;
+            list_entry_ptr->inst_info.expire_time = cur_time + interval;
+            list_del(&list_entry_ptr->node);
+            _insert_task(&timer_ctx.task_root, cur_time + interval, list_entry_ptr);
+
+            rb_entry_ptr = _rb_first_entry(&timer_ctx.task_root);
+            if(NULL != rb_entry_ptr && rb_entry_ptr->expire_time > interval)
+           {
+               timer_ctx.time2wait = interval;
+               need_sem_post = 1;
+           }
+        }
     }
+    d_mutex_unlock(timer_ctx.mtx);
+
+    if (need_sem_post)
+    {
+        d_sem_post(timer_ctx.sem);
+    }
+    return 0;
 }
 
 int timer_api_delete(const char *name)
 {
+    struct rb_node *rbnode = NULL;
+    d_sched_rb_node_t *rb_entry_ptr = NULL;
+    d_sched_list_node_t *list_entry_ptr = NULL;
+    int is_found = 0, need_sem_post = 0;
 
+    d_mutex_lock(timer_ctx.mtx, -1);
+    is_found = _find_task(&timer_ctx.task_root, name, &rb_entry_ptr, &list_entry_ptr);
+    if (is_found)
+    {
+        list_del(&list_entry_ptr->node);
+        free(list_entry_ptr);
+        if (list_empty(&rb_entry_ptr->head.node))
+        {
+            if (_rb_first_entry(&timer_ctx.task_root) == rb_entry_ptr)
+            {
+               need_sem_post = 1;
+            }
+            _rb_erase(&timer_ctx.task_root, rb_entry_ptr);
+            free(rb_entry_ptr);
+        }
+    }
+    d_mutex_unlock(timer_ctx.mtx);
+
+    if (need_sem_post)
+    {
+        d_sem_post(timer_ctx.sem);
+    }
+    return is_found;
 }

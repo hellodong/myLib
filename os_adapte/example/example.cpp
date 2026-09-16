@@ -31,7 +31,7 @@ void thread2mtx(DPvoid_t data)
 	std::cout <<"thread mutex start " << std::endl;
 	while(1)
 	{
-	    d_mutex_lock(local_mtx, -1);
+	    d_mutex_lock(local_mtx, DWAITFOREVER);
             std::cout << "thread( "<<d_thread_self()<< ")mutex lock value "  << g_mutex_lock_value++ << std::endl;
 	    d_mutex_unlock(local_mtx);
 	    d_thread_sleep(1500);

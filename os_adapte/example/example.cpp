@@ -32,7 +32,7 @@ void thread2mtx(DPvoid_t data)
 	while(1)
 	{
 	    d_mutex_lock(local_mtx, DWAITFOREVER);
-            std::cout << "thread( "<<d_thread_self()<< ")mutex lock value "  << g_mutex_lock_value++ << std::endl;
+        std::cout << "thread( "<<d_thread_self()<< ")mutex lock value "  << g_mutex_lock_value++ << std::endl;
 	    d_mutex_unlock(local_mtx);
 	    d_thread_sleep(1500);
 	}
@@ -41,11 +41,11 @@ void thread2mtx(DPvoid_t data)
 int main(int argc, char *argv[])
 {
 	hSem = d_sem_new(1);
-
-	DThread_t thread1id = d_thread_new(NULL, D_THREAD_PRI_IDLE, 256 * 1024, thread1, NULL);
 	hMutex = d_mutex_new();
-	DThread_t thread2id = d_thread_new(NULL, D_THREAD_PRI_IDLE, 128 * 1024, thread2mtx, hMutex);
-	DThread_t thread3id = d_thread_new(NULL, D_THREAD_PRI_IDLE, 128 * 1024, thread2mtx, hMutex);
+
+	d_thread_new(NULL, D_THREAD_PRI_IDLE, 256 * 1024, thread1, NULL);
+	d_thread_new(NULL, D_THREAD_PRI_IDLE, 128 * 1024, thread2mtx, hMutex);
+	d_thread_new(NULL, D_THREAD_PRI_IDLE, 128 * 1024, thread2mtx, hMutex);
 
 	while (1)
 	{

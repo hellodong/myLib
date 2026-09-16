@@ -23,7 +23,7 @@ DMutex_t d_mutex_new(void)
     return pMtx;
 }
 
-int d_mutex_lock(DMutex_t mtx, int timeout)
+int d_mutex_lock(DMutex_t mtx, unsigned int timeout)
 {
     return pthread_mutex_lock(mtx);
 }

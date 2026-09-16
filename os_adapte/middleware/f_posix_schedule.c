@@ -134,9 +134,10 @@ int _insert_task(struct rb_root *task_rb_root, uint32_t expire_time, d_sched_lis
 int _find_task(struct rb_root *task_rb_root, const char *name, d_sched_rb_node_t **rb_entry, d_sched_list_node_t **list_entry)
 {
     int is_found = 0;
-    struct rb_root *rbnode = NULL;
+    struct rb_node *rbnode = NULL;
     d_sched_rb_node_t *rb_entry_ptr = NULL;
     d_sched_list_node_t *list_entry_ptr = NULL;
+
     for (rbnode = rb_first(&timer_ctx.task_root);rbnode;rbnode = rb_next(rbnode))
     {
         list_entry_ptr = NULL;

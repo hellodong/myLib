@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     printf("%u create %s\n", d_time_stampms(), str_array[0]);
     timer_api_create(str_array[0], schedule_task, 500, (void *)str_array[0]);
     d_thread_sleep(600);
+    printf("%u update %s interval to 1\n", d_time_stampms(), str_array[0]);
     timer_api_update_interval(str_array[0], 1);
     d_thread_sleep(4);
     timer_api_delete(str_array[0]);

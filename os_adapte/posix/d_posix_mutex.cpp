@@ -1,8 +1,10 @@
 
 
 #include <stdlib.h>
+#include <time.h>
 
 #include "d_mutex.h"
+
 
 DMutex_t d_mutex_new(void)
 {
@@ -25,7 +27,27 @@ DMutex_t d_mutex_new(void)
 
 int d_mutex_lock(DMutex_t mtx, unsigned int timeout)
 {
-    return pthread_mutex_lock(mtx);
+    if(DWAITFOREVER == timeout)
+    {
+        return pthread_mutex_lock(mtx);
+    }
+    else if (DNOWAIT == timeout)
+    {
+        return pthread_mutex_trylock(mtx);
+    }
+
+    struct timespec ts;
+    
+    if (clock_gettime(CLOCK_REALTIME, &ts) != 0)
+    {
+        return -1;
+    }
+    ts.tv_sec += timeout / 1000;
+    ts.tv_nsec += (timeout % 1000) * 1000000;
+    ts.tv_sec +=ts.tv_nsec / 1000000000;
+    ts.tv_nsec %= 1000000000;
+
+    return pthread_mutex_timedlock(mtx, &ts);
 }
 
 int d_mutex_trylock(DMutex_t mtx)
@@ -44,5 +66,4 @@ int d_mutex_destroy(DMutex_t mtx)
     free(mtx);
     return 0;
 }
-
 

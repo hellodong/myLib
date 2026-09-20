@@ -206,7 +206,7 @@ int _timer_get_coming_task_recfg(struct rb_root *task_root, uint32_t cur_time, f
                 rb_first_entry_ptr = _rb_first_entry(task_root);
                 if (rb_first_entry_ptr)
                 {
-                    next_delay = rb_first_entry_ptr->expire_time - cur_time;
+                    next_delay = rb_first_entry_ptr->expire_time > cur_time ? (rb_first_entry_ptr->expire_time - cur_time) : 0;
                 }
                 else 
                 {

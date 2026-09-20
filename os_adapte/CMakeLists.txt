@@ -8,7 +8,7 @@ endif()
 
 if (MSVC)
     message("Compiler msvc")
-elseif(UNIX)
+else ()
     if (CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0 -fsanitize=address")
     elseif(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
@@ -26,7 +26,7 @@ if (MSVC)
     message("Compiler msvc")
     include_directories("win/")
     set(PLATFORMS_SRCS win/d_win_time.cpp win/d_win_thread.cpp win/d_win_sem.cpp win/d_win_mutex.cpp)
-elseif(UNIX) 
+else ()
     include_directories("posix/")
     include_directories("basic/")
     set(PLATFORMS_SRCS posix/d_posix_time.cpp posix/d_posix_thread.cpp posix/d_posix_sem.cpp posix/d_posix_mutex.cpp)
@@ -36,18 +36,15 @@ set(EXAMPLE1_SRCS example/example.cpp)
 set(EXAMPLE2_SRCS example/example2.cpp)
 set(SCHEDULE_SRCS example/schedule_main.c basic/rbtree.c middleware/f_posix_schedule.c)
 
-add_library(${PROJECT_NAME} STATIC ${PLATFORMS_SRCS})
+add_library(${PROJECT_NAME} STATIC ${PLATFORMS_SRCS} ${COMMON_SRCS})
 #add_library(${PROJECT_NAME} SHARED ${PLATFORMS_SRCS})
 
 add_executable(example1 ${EXAMPLE1_SRCS} ${PLATFORMS_SRCS})
 add_executable(example2 ${EXAMPLE2_SRCS} ${PLATFORMS_SRCS})
 add_executable(schedule_main ${SCHEDULE_SRCS} ${PLATFORMS_SRCS})
 
-if(UNIX)
+if(NOT MSVC)
     target_link_libraries(example1 PRIVATE pthread)
     target_link_libraries(example2 PRIVATE pthread)
     target_link_libraries(schedule_main PRIVATE pthread)
 endif()
-
-
-
